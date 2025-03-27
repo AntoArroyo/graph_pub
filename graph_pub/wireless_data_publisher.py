@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 import os
 import rclpy
 from rclpy.node import Node
@@ -27,12 +25,14 @@ class WirelessDataPublisher(Node):
         self.declare_parameter('frame_id', 'map')
         self.declare_parameter('publish_frequency', 1.0)  # Hz
         self.declare_parameter('map_file', 'mapaTransformSoloLab')  # Added to get map origin
+        self.declare_parameter('distance_threshold', 3)  # Distance threshold for filtering points
         
         # Get parameters
         self.xml_file = self.get_parameter('xml_file').value
         self.frame_id = self.get_parameter('frame_id').value
         self.publish_frequency = self.get_parameter('publish_frequency').value
         self.map_name = self.get_parameter('map_file').value
+        self.distance_threshold = self.get_parameter('distance_threshold').value
         
         # Get map origin and orientation for coordinate transformation
         self.map_origin, self.map_orientation = self.get_map_origin_and_orientation()
@@ -44,6 +44,9 @@ class WirelessDataPublisher(Node):
         
         # Load wireless data and apply the static transform
         self.positions = self.load_and_transform_xml_data()
+        
+        # Filter positions to remove points that are too close
+        self.positions = self.filter_close_points(self.positions, self.distance_threshold)
         
         # Create the point cloud once
         self.static_point_cloud = self.create_point_cloud(self.positions)
@@ -131,6 +134,18 @@ class WirelessDataPublisher(Node):
         except ET.ParseError as e:
             self.get_logger().error(f'Error parsing XML: {e}')
             return []
+
+    def filter_close_points(self, points, threshold):
+        """
+        Filter out points that are too close to each other.
+        Compares every point to ALL existing filtered with the threshold.
+        The distance is calculated using matrix or vector norm.
+        """
+        filtered_points = []
+        for point in points:
+            if all(np.linalg.norm(np.array(point[:3]) - np.array(p[:3])) >= threshold for p in filtered_points):
+                filtered_points.append(point)
+        return filtered_points
 
     def create_point_cloud(self, points):
         """

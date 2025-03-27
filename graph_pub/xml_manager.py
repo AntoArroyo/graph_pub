@@ -31,7 +31,7 @@ def read_xml(filepath: str, filename: str):
         y_elem = position_elem.find('Y')
         z_elem = position_elem.find('Z')
         
-        print(x_elem.text)
+       # print(x_elem.text)
         
         if x_elem is not None and y_elem is not None and z_elem is not None:
             position_data["Position"] = {
