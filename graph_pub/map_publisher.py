@@ -20,7 +20,7 @@ class MapPublisher(Node):
         super().__init__('map_publisher')
         
         # Declare parameters
-        self.declare_parameter('map_file', 'mapaTransformSoloLab')
+        self.declare_parameter('map_file', 'complete_lab')
         self.declare_parameter('frame_id', 'map')
         self.declare_parameter('publish_frequency', 1.0)  # Hz
         
