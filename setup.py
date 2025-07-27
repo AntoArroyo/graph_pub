@@ -22,8 +22,8 @@ setup(
     maintainer='AntoArroyo',
     maintainer_email='arroyo.antom@gmail.com',
     description='Package for publishing map and wireless data as pointcloud',
-    license='TODO: License declaration',
-    tests_require=['pytest'],
+    license='GNU GENERAL PUBLIC LICENSE Version 3',
+   # tests_require=['pytest'],
     entry_points={
         'console_scripts': [
             'map_publisher = graph_pub.map_publisher:main',
